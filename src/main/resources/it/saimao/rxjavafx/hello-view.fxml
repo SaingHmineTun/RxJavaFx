@@ -20,7 +20,7 @@
          <Font name="Monospaced Bold" size="14.0" />
       </font>
    </Button>
-   <Button fx:id="btReactiveX" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="36.0" text="Non Blocking Javafx">
+   <Button fx:id="btReactiveX" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="36.0" text="ReactiveX JavaFx">
       <font>
          <Font name="Monospaced Bold" size="14.0" />
       </font>

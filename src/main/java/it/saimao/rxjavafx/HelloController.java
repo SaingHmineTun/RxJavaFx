@@ -48,7 +48,6 @@ public class HelloController implements Initializable {
                 .map(result -> result.time() > 500 ? new Result(result.name() + " (slow)", result.time()) : result) // 3
                 .observeOn(JavaFxScheduler.platform()) // 4
                 .forEach(result -> observableList.add(result.toString()));
-
     }
 
     private void clearList() {
@@ -59,15 +58,12 @@ public class HelloController implements Initializable {
     }
 
     private void actionNonBlockingList() {
-        listFx.getItems().clear();
-        IntStream.rangeClosed(1, NUMBER_OF_TASKS) // Still Java 8, yaaay!
-                .forEach(i -> Platform.runLater(() -> { // We're using lambda for Runnable, so we cannot map the result
-                    Result result = runTask(i); // So we go one Java version down with the code style
-                    if (result.time() > 500) {
-                        result = new Result(result.time() + " (slow)", result.time());
-                    }
-                    observableList.add(result.toString());
-                }));
+        new Thread(() -> {
+            IntStream.rangeClosed(1, NUMBER_OF_TASKS) // Stream API way of iterating
+                    .mapToObj(this::runTask) // Execute and map the results of our long-running task
+                    .map(result -> result.time() > 500 ? new Result(result.name() + " (slow)", result.time()) : result) // "Annotate" those that took too long
+                    .forEach(result -> Platform.runLater(() -> observableList.add(result.toString()))); // And push them to result list so that they are displayed in UI
+        }).start();
     }
 
     private Result runTask(Integer i) {
@@ -87,7 +83,7 @@ public class HelloController implements Initializable {
     }
 
     private void actionBlockingList() {
-        listFx.getItems().clear();
+        observableList.clear();
         IntStream.rangeClosed(1, NUMBER_OF_TASKS) // Stream API way of iterating
                 .mapToObj(this::runTask) // Execute and map the results of our long-running task
                 .map(result -> result.time() > 500 ? new Result(result.name() + " (slow)", result.time()) : result) // "Annotate" those that took too long
